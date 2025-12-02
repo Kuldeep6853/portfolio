@@ -1,12 +1,20 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { NextResponse } from "next/server";
 
-export async function POST(req) {
+
+export async function POST(request: Request) {
   try {
-    const { query } = await req.json();
+    const { query } = await request.json();
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is missing in .env");
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const knowledgeBase = `
     My name is Alpha.
@@ -20,7 +28,7 @@ export async function POST(req) {
     `;
 
     const prompt = `
-    You are an assistant for my portfolio. 
+    You are an assistant for my portfolio.
 
     Only answer using information below:
 
@@ -34,12 +42,12 @@ export async function POST(req) {
     `;
 
     const result = await model.generateContent(prompt);
-
     const text = result.response.text();
 
-    return Response.json({ answer: text });
-  } catch (err) {
-    console.error("API Error:", err);
-    return Response.json({ answer: "Something went wrong..." });
+    return NextResponse.json({ answer: text });
+
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+    return NextResponse.json({ error: "Something went wrong..." }, { status: 500 });
   }
 }
