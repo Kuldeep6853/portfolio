@@ -1,9 +1,10 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa'
-import { motion } from 'framer-motion'
-import { fadeInUp, fadeIn, slideInLeft, slideInRight } from '@/utils/animations'
+import { useState } from "react";
+import { FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
+import { motion } from "framer-motion";
+import { fadeInUp, fadeIn, slideInLeft, slideInRight } from "@/utils/animations";
+import emailjs from "emailjs-com";
 
 interface FormData {
   name: string;
@@ -11,60 +12,58 @@ interface FormData {
   message: string;
 }
 
-type FormStatus = 'idle' | 'loading' | 'success' | 'error';
+type FormStatus = "idle" | "loading" | "success" | "error";
 
 export default function Contact() {
   const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    message: ''
-  })
-  const [status, setStatus] = useState<FormStatus>('idle')
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [status, setStatus] = useState<FormStatus>("idle");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setStatus('loading')
+    e.preventDefault();
+    setStatus("loading");
 
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      await emailjs.send(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
+        {
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
         },
-        body: JSON.stringify(formData),
-      })
+        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
+      );
 
-      if (!response.ok) throw new Error('Failed to send message')
-      
-      setStatus('success')
-      setFormData({ name: '', email: '', message: '' })
-    } catch {
-      setStatus('error')
+      setStatus("success");
+      setFormData({ name: "", email: "", message: "" });
+    } catch (error) {
+      console.error("Email error:", error);
+      setStatus("error");
     }
-  }
+  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
-    }))
-  }
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   return (
-    <div className="container max-w-7xl mx-auto py-12">
-      <motion.h1 
-        className="text-4xl font-bold mb-8 text-center"
-        {...fadeInUp}
-      >
+    <div className="container max-w-7xl mx-auto py-32">
+      <motion.h1 className="text-4xl font-bold mb-8 text-center" {...fadeInUp}>
         Contact Me
       </motion.h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Contact Information */}
-        <motion.div 
-          className="space-y-8"
-          {...slideInLeft}
-        >
+        <motion.div className="space-y-8" {...slideInLeft}>
           <motion.div {...fadeInUp}>
             <h2 className="text-2xl font-semibold mb-4">Get in Touch</h2>
             <p className="text-secondary">
@@ -72,14 +71,14 @@ export default function Contact() {
               opportunities to be part of your visions.
             </p>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             className="space-y-4"
             variants={fadeIn}
             initial="initial"
             animate="animate"
           >
-            <motion.div 
+            <motion.div
               className="flex items-center gap-4"
               variants={fadeInUp}
               whileHover={{ x: 10 }}
@@ -88,28 +87,16 @@ export default function Contact() {
               <FaEnvelope className="h-6 w-6 text-primary" />
               <div>
                 <h3 className="font-semibold">Email</h3>
-                <a href="mailto:your.email@example.com" className="text-secondary hover:text-primary">
-                  your.email@example.com
+                <a
+                  href="mailto:kuldeep68538@gmail.com"
+                  className="text-secondary hover:text-primary"
+                >
+                  kuldeep68538@gmail.com
                 </a>
               </div>
             </motion.div>
-            
-            <motion.div 
-              className="flex items-center gap-4"
-              variants={fadeInUp}
-              whileHover={{ x: 10 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <FaPhone className="h-6 w-6 text-primary" />
-              <div>
-                <h3 className="font-semibold">Phone</h3>
-                <a href="tel:+1234567890" className="text-secondary hover:text-primary">
-                  +1 (234) 567-890
-                </a>
-              </div>
-            </motion.div>
-            
-            <motion.div 
+
+            <motion.div
               className="flex items-center gap-4"
               variants={fadeInUp}
               whileHover={{ x: 10 }}
@@ -118,19 +105,19 @@ export default function Contact() {
               <FaMapMarkerAlt className="h-6 w-6 text-primary" />
               <div>
                 <h3 className="font-semibold">Location</h3>
-                <p className="text-secondary">San Francisco, CA</p>
+                <p className="text-secondary">Gorakhpur , U.P.</p>
               </div>
             </motion.div>
           </motion.div>
         </motion.div>
-        
+
         {/* Contact Form */}
-        <motion.div 
+        <motion.div
           className="bg-white dark:bg-dark/50 p-6 rounded-lg shadow-md"
           {...slideInRight}
         >
-          <motion.form 
-            onSubmit={handleSubmit} 
+          <motion.form
+            onSubmit={handleSubmit}
             className="space-y-6"
             variants={fadeIn}
             initial="initial"
@@ -150,7 +137,7 @@ export default function Contact() {
                 className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-dark focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </motion.div>
-            
+
             <motion.div variants={fadeInUp}>
               <label htmlFor="email" className="block text-sm font-medium mb-2">
                 Email
@@ -165,7 +152,7 @@ export default function Contact() {
                 className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-dark focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </motion.div>
-            
+
             <motion.div variants={fadeInUp}>
               <label htmlFor="message" className="block text-sm font-medium mb-2">
                 Message
@@ -180,19 +167,19 @@ export default function Contact() {
                 className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-dark focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </motion.div>
-            
+
             <motion.button
               type="submit"
-              disabled={status === 'loading'}
+              disabled={status === "loading"}
               className="w-full btn btn-primary"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              {status === 'loading' ? 'Sending...' : 'Send Message'}
+              {status === "loading" ? "Sending..." : "Send Message"}
             </motion.button>
-            
-            {status === 'success' && (
-              <motion.p 
+
+            {status === "success" && (
+              <motion.p
                 className="text-green-500 text-center"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -200,9 +187,9 @@ export default function Contact() {
                 Message sent successfully!
               </motion.p>
             )}
-            
-            {status === 'error' && (
-              <motion.p 
+
+            {status === "error" && (
+              <motion.p
                 className="text-red-500 text-center"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -214,5 +201,5 @@ export default function Contact() {
         </motion.div>
       </div>
     </div>
-  )
-} 
+  );
+}

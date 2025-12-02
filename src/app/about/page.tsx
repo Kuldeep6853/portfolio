@@ -13,7 +13,7 @@ import {
 
 export default function About() {
   return (
-    <div className="container max-w-7xl mx-auto py-12">
+    <div className="container max-w-7xl mx-auto py-32">
       <motion.h1 
         className="text-4xl font-bold mb-8 text-center"
         {...fadeInDown}
